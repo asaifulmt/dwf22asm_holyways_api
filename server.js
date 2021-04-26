@@ -5,8 +5,8 @@ const app = express()
 
 app.use(express.json())
 
-app.get('/', (_, res) => res.send('ok'))
-app.get('/api/v1', router)
+app.get('/', (_, res) => res.send('server is alive!'))
+app.use('/api/v1', router)
 
 const port = 5000
 
