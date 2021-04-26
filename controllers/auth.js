@@ -69,3 +69,63 @@ exports.register = async (req, res) => {
     })
   }
 }
+
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body
+    const schema = joi.object({
+      email: joi.string().email().required(),
+      password: joi.string().required(),
+    })
+
+    const { error } = schema.validate(req.body);
+
+    if (error) {
+      return res.send({
+        status: "Validation Failed",
+        message: error.details[0].message
+      })
+    }
+
+    const checkEmail = await user.findOne({ where: { email } })
+
+    if (!checkEmail) {
+      return res.send({
+        status: "Login Failed",
+        message: "Email and Password don't match",
+      })
+    }
+
+    const isValidPassword = await bcrypt.compare(password, checkEmail.password);
+
+    if (!isValidPassword) {
+      return res.send({
+        status: "Login Failed",
+        message: "Email and Password don't match",
+      })
+    }
+
+    const token = jwt.sign({
+      id: checkEmail.id,
+      fullName: checkEmail.fullName,
+      email: checkEmail.email
+    }, secretKey)
+
+    res.send({
+      status: "success",
+      data: {
+        user: {
+          fullName: checkEmail.fullName,
+          email: checkEmail.email,
+          token
+        }
+      },
+    })
+  } catch(err) {
+    console.log(err)
+    res.status(500).send({
+      status: "failed",
+      message: "server error"
+    })
+  }
+}
