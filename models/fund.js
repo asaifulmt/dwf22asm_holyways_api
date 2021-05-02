@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ user, userDonate }) {
       // define association here
-      this.belongsToMany(user, { as: 'usersDonate', through: userDonate, foreignKey: 'userId' })
+      this.belongsToMany(user, { as: 'usersDonate', through: userDonate })
     }
     toJSON(){
       return {...this.get(), userId: undefined, createdAt: undefined, updatedAt: undefined}
